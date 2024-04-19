@@ -63,10 +63,25 @@ class CarInterface(CarInterfaceBase):
     else:
       raise ValueError(f"Unsupported car: {candidate}")
 
-    if ret.flags & ChryslerFlags.HIGHER_MIN_STEERING_SPEED:
-      # TODO: allow these cars to steer down to 13 m/s if already engaged.
-      # TODO: Durango 2020 may be able to steer to zero once above 38 kph
-      ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+    # Check if the car should have a higher minimum steering speed
+if ret.flags & ChryslerFlags.HIGHER_MIN_STEERING_SPEED:
+    # Check if the current speed is above 17.5 m/s
+    if ret.vEgo > 17.5:
+        # Increment the counter when speed is above the threshold
+        speed_above_threshold_count = 1
+    else:
+        # Reset the counter if speed falls below the threshold
+        speed_above_threshold_count = 0
+
+    # Check if the speed has been consistently above the threshold (e.g., for a certain duration or number of samples)
+    if speed_above_threshold_count = 1:
+        ret.minSteerSpeed = 13  # m/s if consistently above threshold
+    else:
+        ret.minSteerSpeed = 17.5  # m/s initially, to be adjusted if consistently above threshold
+else:
+    # Reset the counter if the higher minimum steering speed is not applicable
+    speed_above_threshold_count = 0
+    ret.minSteerSpeed = 17.5  # m/s initially
 
     ret.centerToFront = ret.wheelbase * 0.44
     ret.enableBsm = 720 in fingerprint[0]
